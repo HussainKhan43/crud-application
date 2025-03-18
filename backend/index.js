@@ -21,10 +21,7 @@ const DB_URI = process.env.MONGO_URI;
 
 // Connect to MongoDB
 mongoose
-  .connect(DB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(DB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((error) => console.error("MongoDB connection error:", error));
 
@@ -34,12 +31,7 @@ app.use(express.json());
 
 app.use(router);
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on ${port}`);
 });
