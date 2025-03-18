@@ -1,0 +1,124 @@
+import React, { useState, useEffect ,useContext} from 'react';
+import { NavLink, useParams, useNavigate } from 'react-router-dom';
+import { updatedata } from '../context/ContextProvider';
+import { BACKEND_URL } from "../utils/utils";
+
+function Edit() {
+
+      const {updata, setUPdata} = useContext(updatedata);
+  
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [inpVal, setINP] = useState({
+    name: "",
+    email: "",
+    age: "",
+    mobile: "",
+    work: "",
+    address: "",
+    description: "",
+  });
+
+  const setdata = (e) => {
+    const { name, value } = e.target;
+    setINP((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const getdata = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/getuser/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+
+      const data = await res.json();
+      setINP(data);
+      console.log("Data fetched successfully:", data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getdata();
+  }, [id]);
+
+  const updateuser = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${BACKEND_URL}/updateuser/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inpVal),
+      });
+    
+      const data2 = await res.json();
+      if (!res.ok) {
+        throw new Error("Failed to update user");
+      }
+
+      alert("User updated successfully!");
+      setUPdata(data2);
+      navigate("/");
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  return (
+    <>
+      <div className="container mt-4">
+        <NavLink to="/">Home</NavLink>
+      </div>
+      <div className="container mt-3">
+        <form className="mt-4" onSubmit={updateuser}>
+          <div className="row">
+            <div className="mb-3 col-lg-6 col-md-6 col-12">
+              <label htmlFor="name" className="form-label">Name</label>
+              <input type="text" className="form-control" id="name" name="name" placeholder="Enter your name" value={inpVal.name} onChange={setdata} />
+            </div>
+            <div className="mb-3 col-lg-6 col-md-6 col-12">
+              <label htmlFor="email" className="form-label">Email</label>
+              <input type="email" className="form-control" id="email" name="email" placeholder="Enter your email" value={inpVal.email} onChange={setdata} />
+            </div>
+            <div className="mb-3 col-lg-6 col-md-6 col-12">
+              <label htmlFor="age" className="form-label">Age</label>
+              <input type="number" className="form-control" id="age" name="age" placeholder="Enter your age" value={inpVal.age} onChange={setdata} />
+            </div>
+            <div className="mb-3 col-lg-6 col-md-6 col-12">
+              <label htmlFor="mobile" className="form-label">Mobile</label>
+              <input type="tel" className="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number" value={inpVal.mobile} onChange={setdata} />
+            </div>
+            <div className="mb-3 col-lg-6 col-md-6 col-12">
+              <label htmlFor="work" className="form-label">Work</label>
+              <input type="text" className="form-control" id="work" name="work" placeholder="Enter your profession" value={inpVal.work} onChange={setdata} />
+            </div>
+            <div className="mb-3 col-lg-6 col-md-6 col-12">
+              <label htmlFor="address" className="form-label">Address</label>
+              <input type="text" className="form-control" id="address" name="address" placeholder="Enter your address" value={inpVal.address} onChange={setdata} />
+            </div>
+            <div className="mb-3 col-lg-12 col-md-12 col-12">
+              <label htmlFor="description" className="form-label">Description</label>
+              <textarea className="form-control" id="description" name="description" cols="30" rows="5" placeholder="Enter description" value={inpVal.description} onChange={setdata}></textarea>
+            </div>
+            <button type="submit" className="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+}
+
+export default Edit;
